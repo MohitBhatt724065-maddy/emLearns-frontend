@@ -39,3 +39,16 @@ App runs at `http://localhost:3000`.
 ## Environment Variables
 
 Copy `.env.example` to `.env` and fill in values:
+
+
+## Backend
+
+The backend (Django + MySQL) lives in a separate repository: _link coming soon_.
+
+## Screenshots
+
+_Add screenshots here_
+
+## Author
+
+Mohit Bhatt
