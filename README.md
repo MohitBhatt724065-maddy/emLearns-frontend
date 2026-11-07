@@ -1,20 +1,41 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# emLearns Frontend
 
-# Run and deploy your AI Studio app
+React frontend for emLearns, a neuroscience E-Learning platform with an interactive
+assessment engine, performance analytics dashboard, and course catalog.
 
-This contains everything you need to run your app locally.
+## Tech Stack
 
-View your app in AI Studio: https://ai.studio/apps/683cf1c8-80fb-47dc-b7eb-77341c554cf7
+- React + TypeScript
+- Vite
+- Tailwind CSS
+- Recharts (analytics charts)
+- Axios (API calls)
 
-## Run Locally
+## Features
 
-**Prerequisites:**  Node.js
+- Course catalog and course details
+- Learning interface and "My Learning" page
+- Assessments (list + quiz-taking page)
+- Student dashboard and performance analytics
+- Authentication pages (login, register, forgot password)
 
+## Getting Started
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### Prerequisites
+- Node.js 18+
+- npm
+
+### Installation
+
+```bash
+git clone https://github.com/MohitBhatt724065-maddy/emLearns-frontend.git
+cd emLearns-frontend
+npm install
+npm run dev
+```
+
+App runs at `http://localhost:3000`.
+
+## Environment Variables
+
+Copy `.env.example` to `.env` and fill in values:
