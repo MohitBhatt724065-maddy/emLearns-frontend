@@ -1,8 +1,21 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, {
+  AxiosInstance,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from 'axios';
 
-// Central API Configuration for Django REST Framework integration
-// Default fallback points to Django backend API prefix /api/v1
-const API_BASE_URL = import.meta.env.VITE_DJANGO_API_URL || '/api/v1';
+const API_BASE_URL =
+  import.meta.env.VITE_DJANGO_API_URL || 'http://127.0.0.1:8000/api';
+
+export const ACCESS_KEY = 'emlearns_auth_token';
+export const REFRESH_KEY = 'emlearns_refresh_token';
+export const USER_KEY = 'emlearns_current_student';
+
+export const clearAuthStorage = () => {
+  localStorage.removeItem(ACCESS_KEY);
+  localStorage.removeItem(REFRESH_KEY);
+  localStorage.removeItem(USER_KEY);
+};
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -13,10 +26,9 @@ export const apiClient: AxiosInstance = axios.create({
   timeout: 10000,
 });
 
-// Request interceptor to attach JWT / Session token
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('emlearns_auth_token');
+    const token = localStorage.getItem(ACCESS_KEY);
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -25,14 +37,48 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor with graceful fallback
+let refreshPromise: Promise<string> | null = null;
+
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
-  (error) => {
-    // When standalone without Django backend running, log cleanly
-    if (error.code === 'ERR_NETWORK' || error.response?.status === 404) {
-      console.info('[emLearns API Service] Operating with local client repository cache.');
+  async (error) => {
+    const original = error.config as
+      | (InternalAxiosRequestConfig & { _retry?: boolean })
+      | undefined;
+    const status = error.response?.status;
+    const url = original?.url ?? '';
+    const isAuthCall =
+      url.includes('/auth/login/') ||
+      url.includes('/auth/register/') ||
+      url.includes('/auth/refresh/');
+
+    if (status === 401 && original && !original._retry && !isAuthCall) {
+      original._retry = true;
+      const refresh = localStorage.getItem(REFRESH_KEY);
+
+      if (refresh) {
+        try {
+          if (!refreshPromise) {
+            refreshPromise = axios
+              .post(`${API_BASE_URL}/auth/refresh/`, { refresh })
+              .then((res) => res.data.access as string)
+              .finally(() => {
+                refreshPromise = null;
+              });
+          }
+          const newAccess = await refreshPromise;
+          localStorage.setItem(ACCESS_KEY, newAccess);
+          original.headers.Authorization = `Bearer ${newAccess}`;
+          return apiClient(original);
+        } catch {
+          clearAuthStorage();
+        }
+      } else {
+        clearAuthStorage();
+      }
     }
+
+    console.error('[emLearns API] Request failed:', error);
     return Promise.reject(error);
   }
 );

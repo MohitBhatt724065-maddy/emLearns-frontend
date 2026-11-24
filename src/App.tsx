@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CourseProgressProvider } from './context/CourseProgressContext';
 
@@ -23,6 +23,26 @@ import PerformanceAnalyticsPage from './pages/Performance/PerformanceAnalyticsPa
 import StudentProfilePage from './pages/Profile/StudentProfilePage';
 import SettingsPage from './pages/Settings/SettingsPage';
 import MyLearningPage from './pages/MyLearning/MyLearningPage';
+
+// Sends logged-out visitors to the login page
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F5F8FC] text-sm text-slate-500">
+        Loading your session...
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+
+  return <>{children}</>;
+};
 
 // Public Course Catalog Shell with top bar
 const PublicCatalogLayout: React.FC = () => {
@@ -62,20 +82,29 @@ export default function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-            {/* Public or Student Catalog Access */}
+            {/* Public Course Catalog Access */}
             <Route path="/courses" element={<PublicCatalogLayout />} />
             <Route path="/courses/:id" element={<PublicCourseDetailsLayout />} />
 
-            {/* Immersive Dedicated Learning Interface (distraction-free 3-column room) */}
-            <Route path="/learning/:id" element={<LearningInterfacePage />} />
+            {/* Learning room (login required) */}
+            <Route
+              path="/learning/:id"
+              element={
+                <ProtectedRoute>
+                  <LearningInterfacePage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Authenticated Student Portal */}
             <Route
               element={
-                <StudentLayout
-                  title="emLearns Neuro Portal"
-                  subtitle="Centralized Neurosurgery & Neuroscience LMS"
-                />
+                <ProtectedRoute>
+                  <StudentLayout
+                    title="emLearns Neuro Portal"
+                    subtitle="Centralized Neurosurgery & Neuroscience LMS"
+                  />
+                </ProtectedRoute>
               }
             >
               <Route path="/dashboard" element={<DashboardPage />} />

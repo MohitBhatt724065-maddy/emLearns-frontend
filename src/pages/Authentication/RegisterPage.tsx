@@ -1,16 +1,35 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Brain, ArrowRight, Lock, Mail, User, Building2, GraduationCap, ShieldAlert } from 'lucide-react';
+import {
+  Brain,
+  ArrowRight,
+  Lock,
+  Mail,
+  User,
+  AtSign,
+  Building2,
+  GraduationCap,
+  ShieldAlert,
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+
+const inputClass =
+  'block w-full rounded-lg border border-slate-300 pl-10 pr-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none';
+const labelClass =
+  'block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1';
+const iconClass =
+  'w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2';
 
 export const RegisterPage: React.FC = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [institution, setInstitution] = useState('');
-  const [trainingLevel, setTrainingLevel] = useState('Neurosurgery Resident');
+  const [academicLevel, setAcademicLevel] = useState('Neurosurgery Resident');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -20,8 +39,8 @@ export const RegisterPage: React.FC = () => {
     e.preventDefault();
     setError(null);
 
-    if (!name || !email || !password || !institution) {
-      setError('Please fill in all required academic fields.');
+    if (!firstName || !lastName || !username || !email || !password) {
+      setError('Please fill in all required fields.');
       return;
     }
 
@@ -38,14 +57,18 @@ export const RegisterPage: React.FC = () => {
     try {
       setLoading(true);
       await register({
-        name,
-        email,
-        institution,
-        trainingLevel,
+        username: username.trim(),
+        email: email.trim(),
+        password,
+        password2: confirmPassword,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        institution: institution.trim(),
+        academicLevel,
       });
       navigate('/dashboard');
-    } catch {
-      setError('Unable to register user account. Please check provided details.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -75,72 +98,96 @@ export const RegisterPage: React.FC = () => {
           {error && (
             <div className="mb-5 p-3 rounded-lg bg-rose-50 border border-rose-200 flex items-start gap-2.5 text-xs text-rose-700">
               <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
-              <span>{error}</span>
+              <span className="whitespace-pre-line">{error}</span>
             </div>
           )}
 
           <form className="space-y-4" onSubmit={handleSubmit}>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                Full Name & Credentials
-              </label>
-              <div className="relative rounded-md shadow-2xs">
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Dr. Alex Morgan, MD"
-                  className="block w-full rounded-lg border border-slate-300 pl-10 pr-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none"
-                />
-                <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>First Name</label>
+                <div className="relative rounded-md shadow-2xs">
+                  <input
+                    type="text"
+                    required
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="Alex"
+                    className={inputClass}
+                  />
+                  <User className={iconClass} />
+                </div>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                Academic / Medical Email
-              </label>
-              <div className="relative rounded-md shadow-2xs">
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="alex.morgan@universityhospital.edu"
-                  className="block w-full rounded-lg border border-slate-300 pl-10 pr-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none"
-                />
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <div>
+                <label className={labelClass}>Last Name</label>
+                <div className="relative rounded-md shadow-2xs">
+                  <input
+                    type="text"
+                    required
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Morgan"
+                    className={inputClass}
+                  />
+                  <User className={iconClass} />
+                </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                  Affiliated Institution
-                </label>
+                <label className={labelClass}>Username</label>
                 <div className="relative rounded-md shadow-2xs">
                   <input
                     type="text"
                     required
-                    value={institution}
-                    onChange={(e) => setInstitution(e.target.value)}
-                    placeholder="e.g. Oxford / Charité"
-                    className="block w-full rounded-lg border border-slate-300 pl-10 pr-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none"
+                    autoComplete="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="alex_morgan"
+                    className={inputClass}
                   />
-                  <Building2 className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <AtSign className={iconClass} />
                 </div>
               </div>
-
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                  Training Stage
-                </label>
+                <label className={labelClass}>Email</label>
+                <div className="relative rounded-md shadow-2xs">
+                  <input
+                    type="email"
+                    required
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="alex@hospital.edu"
+                    className={inputClass}
+                  />
+                  <Mail className={iconClass} />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Institution</label>
+                <div className="relative rounded-md shadow-2xs">
+                  <input
+                    type="text"
+                    value={institution}
+                    onChange={(e) => setInstitution(e.target.value)}
+                    placeholder="e.g. Far Western University"
+                    className={inputClass}
+                  />
+                  <Building2 className={iconClass} />
+                </div>
+              </div>
+              <div>
+                <label className={labelClass}>Training Stage</label>
                 <div className="relative rounded-md shadow-2xs">
                   <select
-                    value={trainingLevel}
-                    onChange={(e) => setTrainingLevel(e.target.value)}
-                    className="block w-full rounded-lg border border-slate-300 pl-10 pr-3 py-2 text-sm text-slate-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none bg-white"
+                    value={academicLevel}
+                    onChange={(e) => setAcademicLevel(e.target.value)}
+                    className={`${inputClass} bg-white`}
                   >
                     <option value="Medical Student">Medical Student</option>
                     <option value="Neurosurgery Resident">Neurosurgery Resident (PGY 1-7)</option>
@@ -148,43 +195,40 @@ export const RegisterPage: React.FC = () => {
                     <option value="Neuroscience Researcher">Neuroscience Researcher / PhD</option>
                     <option value="Attending Neurosurgeon">Attending / Consultant Neurosurgeon</option>
                   </select>
-                  <GraduationCap className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <GraduationCap className={iconClass} />
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                  Password
-                </label>
+                <label className={labelClass}>Password</label>
                 <div className="relative rounded-md shadow-2xs">
                   <input
                     type="password"
                     required
+                    autoComplete="new-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="At least 8 characters"
-                    className="block w-full rounded-lg border border-slate-300 pl-10 pr-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none"
+                    className={inputClass}
                   />
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Lock className={iconClass} />
                 </div>
               </div>
-
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                  Confirm Password
-                </label>
+                <label className={labelClass}>Confirm Password</label>
                 <div className="relative rounded-md shadow-2xs">
                   <input
                     type="password"
                     required
+                    autoComplete="new-password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Repeat password"
-                    className="block w-full rounded-lg border border-slate-300 pl-10 pr-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none"
+                    className={inputClass}
                   />
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Lock className={iconClass} />
                 </div>
               </div>
             </div>
@@ -195,7 +239,7 @@ export const RegisterPage: React.FC = () => {
                 disabled={loading}
                 className="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-[#2563EB] hover:bg-blue-700 focus:outline-none transition-colors disabled:opacity-50"
               >
-                <span>{loading ? 'Creating Trainee Profile...' : 'Complete Registration'}</span>
+                <span>{loading ? 'Creating account...' : 'Complete Registration'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
