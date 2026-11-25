@@ -49,6 +49,16 @@ export interface BackendEnrollment {
   progress_percent: number;
 }
 
+export interface BackendEnrollment {
+  id: number;
+  course: BackendCourse;
+  enrolled_at: string;
+  total_lessons: number;
+  completed_lessons: number;
+  progress_percent: number;
+  next_lesson_id: number | null;
+}
+
 export interface BackendCourseProgress {
   course: number;
   completed_lesson_ids: number[];

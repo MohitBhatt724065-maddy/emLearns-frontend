@@ -4,10 +4,7 @@ import {
   LayoutDashboard,
   Compass,
   GraduationCap,
-  FileCheck2,
-  BarChart3,
   UserCircle2,
-  Settings,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -37,14 +34,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     navigate('/');
   };
 
-  const navItems = [
+    const navItems = [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { label: 'Explore Courses', path: '/courses', icon: Compass },
     { label: 'My Learning', path: '/my-learning', icon: GraduationCap },
-    { label: 'Assessments', path: '/assessments', icon: FileCheck2 },
-    { label: 'Performance', path: '/performance', icon: BarChart3 },
     { label: 'Profile', path: '/profile', icon: UserCircle2 },
-    { label: 'Settings', path: '/settings', icon: Settings },
   ];
 
   const content = (
@@ -123,11 +117,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {(!collapsed || mobileOpen) && user && (
           <div className="flex items-center gap-3 px-2 py-1.5">
             <img
-              src={user.avatarUrl}
-              alt={user.name}
-              className="w-8 h-8 rounded-full object-cover border border-sky-400/30 shrink-0"
-              referrerPolicy="no-referrer"
-            />
+               src={user.avatarUrl}
+               alt={user.name}
+               className="w-8 h-8 rounded-full object-cover border border-sky-400/30 shrink-0"
+               referrerPolicy="no-referrer"
+              />
             <div className="overflow-hidden">
               <p className="text-xs font-semibold text-white truncate">{user.name}</p>
               <p className="text-[11px] text-slate-400 truncate">{user.trainingLevel}</p>

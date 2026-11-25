@@ -36,9 +36,7 @@ export const Navbar: React.FC = () => {
             <a href="#why-emlearns" className="hover:text-[#142D4E] transition-colors whitespace-nowrap">
               Why emLearns
             </a>
-            <a href="#faculty" className="hover:text-[#142D4E] transition-colors whitespace-nowrap">
-              Faculty
-            </a>
+            
           </nav>
 
           {/* Zone 3: 1 primary action */}
