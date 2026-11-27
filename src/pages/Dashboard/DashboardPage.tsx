@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BookOpen, CheckCircle2, Play, GraduationCap } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -6,10 +6,15 @@ import { useCourseProgress } from '../../context/CourseProgressContext';
 
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
-  const { enrollments, completedCoursesCount, isLoading } = useCourseProgress();
+  const { enrollments, completedCoursesCount, isLoading, refreshEnrollments } = useCourseProgress();
   const navigate = useNavigate();
 
-    const name = user?.name || 'Learner';
+  useEffect(() => {
+    refreshEnrollments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const name = user?.name || 'Learner';
   const inProgress = enrollments.filter((e) => e.progress_percent < 100);
   const current = inProgress[0] ?? null;
 
@@ -29,6 +34,8 @@ export const DashboardPage: React.FC = () => {
           <p className="text-sm text-slate-600">
             {current
               ? `You are currently studying ${current.course.title}.`
+              : enrollments.length > 0
+              ? 'You have completed all your enrolled courses. Browse the catalog for more.'
               : 'You have not enrolled in any course yet. Browse the catalog to get started.'}
           </p>
         </div>
@@ -89,7 +96,7 @@ export const DashboardPage: React.FC = () => {
         ) : (
           <div className="text-center py-8 space-y-3">
             <GraduationCap className="w-10 h-10 text-slate-300 mx-auto" />
-            <p className="text-xs text-slate-500">Nothing in progress yet.</p>
+            <p className="text-xs text-slate-500">Nothing in progress right now.</p>
             <button
               onClick={() => navigate('/courses')}
               className="px-4 py-2 text-xs font-semibold text-white bg-[#142D4E] rounded-lg"

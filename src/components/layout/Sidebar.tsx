@@ -116,12 +116,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="p-3 border-t border-slate-700/60 shrink-0 space-y-2">
         {(!collapsed || mobileOpen) && user && (
           <div className="flex items-center gap-3 px-2 py-1.5">
-            <img
-               src={user.avatarUrl}
-               alt={user.name}
-               className="w-8 h-8 rounded-full object-cover border border-sky-400/30 shrink-0"
-               referrerPolicy="no-referrer"
-              />
+            {user.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt={user.name}
+                  className="w-8 h-8 rounded-full object-cover border border-sky-400/30 shrink-0"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-sky-500/20 text-sky-300 flex items-center justify-center text-xs font-bold shrink-0">
+                  {(user.name || '?').charAt(0).toUpperCase()}
+                </div>
+              )}
             <div className="overflow-hidden">
               <p className="text-xs font-semibold text-white truncate">{user.name}</p>
               <p className="text-[11px] text-slate-400 truncate">{user.trainingLevel}</p>

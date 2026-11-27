@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { GraduationCap, BookOpen, Play } from 'lucide-react';
 import { useCourseProgress } from '../../context/CourseProgressContext';
 
 export const MyLearningPage: React.FC = () => {
   const navigate = useNavigate();
-  const { enrollments, isLoading } = useCourseProgress();
+  const { enrollments, isLoading, refreshEnrollments } = useCourseProgress();
   const [tab, setTab] = useState<'all' | 'in-progress' | 'completed'>('all');
+
+  useEffect(() => {
+    refreshEnrollments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const filtered = enrollments.filter((e) => {
     if (tab === 'in-progress') return e.progress_percent < 100;
